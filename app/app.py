@@ -63,8 +63,11 @@ if st.button("Analyze"):
         # Loop through candidates
         for name, score, resume_text in ranked:
 
-            # ✅ SINGLE FIXED VARIABLE
             try:
+                # handle numpy array properly
+                if hasattr(score, "__len__"):
+                    score = score[0]
+
                 percentage = float(score) * 100
             except:
                 percentage = 0
