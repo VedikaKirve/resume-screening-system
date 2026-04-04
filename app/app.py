@@ -29,7 +29,7 @@ if st.button("Analyze"):
     # ✅ Step 1: Process resumes FIRST
     for file in files:
         text = extract_text(file)
-        clean = clean_text(text)
+        clean = text.lower()
 
         resumes.append(clean)
         names.append(file.name)
