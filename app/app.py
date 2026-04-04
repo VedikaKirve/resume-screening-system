@@ -11,7 +11,6 @@ from src.vectorizer import get_vectors
 from src.similarity import calculate_similarity
 from src.ranking import rank_candidates
 from src.skills_extractor import extract_skills
-from src.bert_similarity import get_bert_similarity
 
 st.title("📄 Resume Screening System")
 
@@ -45,7 +44,8 @@ if st.button("Analyze"):
         st.write(f"✅ {skill.capitalize()}")
 
     # ✅ Step 4: ML processing
-    scores = get_bert_similarity(resumes, job_clean)
+    vectors = get_vectors(resumes, job_clean)
+    scores = calculate_similarity(vectors)
 
     ranked = sorted(zip(names, scores, resumes), key=lambda x: x[1], reverse=True)
 
