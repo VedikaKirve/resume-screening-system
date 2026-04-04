@@ -35,7 +35,7 @@ if st.button("Analyze"):
         names.append(file.name)
 
     # ✅ Step 2: Clean job description
-    job_clean = clean_text(job_desc)
+    job_clean = job_desc.lower()
 
     # ✅ Step 3: Skills extraction
     skills = extract_skills(job_clean)
