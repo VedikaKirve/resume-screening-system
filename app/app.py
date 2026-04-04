@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -65,9 +66,12 @@ if st.button("Analyze"):
     final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent) 
 
     st.write(f"📄 {name}")
-    if percentage is not None:
-        progress_value = min(max(int(percentage), 0), 100)
+
+    if isinstance(percentage, (int, float)) and not math.isnan(percentage):
+        progress_value = int(min(max(percentage, 0), 100))
         st.progress(progress_value)
+    else:
+        st.progress(0)
     st.success(f"🎯 Final Score: {final_score:.2f}%")
 
     with st.expander("📊 Detailed Breakdown"):
