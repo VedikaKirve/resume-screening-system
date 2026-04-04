@@ -1,18 +1,19 @@
 import sys
 import os
 import math
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import streamlit as st
 
+# Fix import path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Imports
 from src.pdf_extractor import extract_text
 from src.preprocessing import clean_text
 from src.vectorizer import get_vectors
 from src.similarity import calculate_similarity
-from src.ranking import rank_candidates
 from src.skills_extractor import extract_skills
 
+# UI
 st.title("📄 Resume Screening System")
 
 job_desc = st.text_area("Enter Job Description")
@@ -20,114 +21,114 @@ files = st.file_uploader("Upload Resumes", accept_multiple_files=True)
 
 if st.button("Analyze"):
 
-    st.subheader("📊 Resume Ranking Results")
-    st.progress(70)
-
-    resumes = []
-    names = []
-
-    # ✅ Step 1: Process resumes FIRST
-    for file in files:
-        text = extract_text(file)
-        clean = text.lower()
-
-        resumes.append(clean)
-        names.append(file.name)
-
-    # ✅ Step 2: Clean job description
-    job_clean = job_desc.lower()
-
-    # ✅ Step 3: Skills extraction
-    skills = extract_skills(job_clean)
-    st.markdown("### 🧠 Required Skills")
-
-    for skill in skills:
-        st.write(f"✅ {skill.capitalize()}")
-
-    # ✅ Step 4: ML processing
-    vectors = get_vectors(resumes, job_clean)
-    scores = calculate_similarity(vectors)
-    st.write("DEBUG SCORES:", scores)
-    st.write("JOB DESC:", job_clean[:200])
-    st.write("RESUME SAMPLE:", resumes[0][:200])
-
-    ranked = sorted(zip(names, scores, resumes), key=lambda x: x[1], reverse=True)
-
-    # ✅ Step 5: Show results
-    st.success(f"🏆 Top Candidate: {ranked[0][0]}")
-
-    for name, score, resume_text in ranked:
-        percentage = score * 100
-
-    # ✅ Skill match logic
-    matched_skills = [skill for skill in skills if skill in resume_text]
-    skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
-
-    if isinstance(score, (int, float)) and not math.isnan(score):
-        tfidf_percent = float(score) * 100
-    else:
-        tfidf_percent = 0
-
-    skill_percent = skill_match_percent
-
-    final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent)
-
-    if isinstance(score, (int, float)) and not math.isnan(score):
-        percentage = score * 100
-    else:
-        percentage = 0
-
-    st.write(f"📄 {name}")
-
-    if isinstance(percentage, (int, float)) and not math.isnan(percentage):
-        progress_value = int(min(max(percentage, 0), 100))
-        st.progress(progress_value)
-    else:
-        st.progress(0)
-    if isinstance(final_score, (int, float)) and not math.isnan(final_score):
-        st.success(f"🎯 Final Score: {final_score:.2f}%")
-    else:
-        st.success("🎯 Final Score: 0.00%")
-
-    with st.expander("📊 Detailed Breakdown"):
-        if isinstance(tfidf_percent, (int, float)) and not math.isnan(tfidf_percent):
-            st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
-        else:
-            st.write("📊 Text Similarity: 0.00%")
-        st.write(f"🧠 Skill Match: {skill_percent:.2f}%")
-
-    # Show matched skills
-    st.markdown("### ✅ Matched Skills")
-    for skill in matched_skills:
-        st.write(f"✅ {skill.capitalize()}")
-
-    st.markdown("---")
-
-    missing_skills = [skill for skill in skills if skill not in resume_text]
-
-    st.markdown("### ❌ Missing Skills")
-    for skill in missing_skills:
-        st.write(f"❌ {skill.capitalize()}")
-
-    if skill_match_percent > 70:
-        st.success("💪 Strong Match")
-    elif skill_match_percent > 40:
-        st.warning("⚠️ Moderate Match")
-    else:
-        st.error("❌ Weak Match")
-
     if not files or not job_desc:
         st.warning("Please upload resumes and enter job description")
+    else:
+        st.subheader("📊 Resume Ranking Results")
+        st.progress(30)
 
-    st.info(f"Out of {len(skills)} required skills, {len(matched_skills)} matched")
+        resumes = []
+        names = []
 
-    report = f"""
-    Candidate: {name}
-    Match Score: {percentage:.2f}%
-    Skill Match: {skill_match_percent:.2f}%
+        # Step 1: Process resumes
+        for file in files:
+            text = extract_text(file)
+            clean = clean_text(text)
+            resumes.append(clean)
+            names.append(file.name)
 
-    Matched Skills: {", ".join(matched_skills)}
-    Missing Skills: {", ".join(missing_skills)}
-    """
+        # Step 2: Clean job description
+        job_clean = clean_text(job_desc)
 
-    st.download_button("📥 Download Report", report, file_name="report.txt")
+        # Step 3: Extract skills
+        skills = extract_skills(job_clean)
+
+        st.markdown("### 🧠 Required Skills")
+        for skill in skills:
+            st.write(f"✅ {skill.capitalize()}")
+
+        # Step 4: TF-IDF + Similarity
+        vectors = get_vectors(resumes, job_clean)
+        scores = calculate_similarity(vectors)
+
+        # DEBUG (you can remove later)
+        st.write("DEBUG SCORES:", scores)
+
+        # Ranking
+        ranked = sorted(zip(names, scores, resumes), key=lambda x: x[1], reverse=True)
+
+        # Top candidate
+        st.success(f"🏆 Top Candidate: {ranked[0][0]}")
+
+        # Loop through candidates
+        for name, score, resume_text in ranked:
+
+            # ✅ Safe TF-IDF %
+            if isinstance(score, (int, float)) and not math.isnan(score):
+                tfidf_percent = float(score) * 100
+            else:
+                tfidf_percent = 0
+
+            # ✅ Skill match
+            matched_skills = [skill for skill in skills if skill in resume_text]
+            skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
+
+            # ✅ Final Score (balanced)
+            final_score = (0.5 * tfidf_percent) + (0.5 * skill_match_percent)
+
+            # Display candidate
+            st.write(f"📄 {name}")
+
+            # Progress bar
+            try:
+                progress_value = int(min(max(tfidf_percent, 0), 100))
+                st.progress(progress_value)
+            except:
+                st.progress(0)
+
+            # Final Score
+            if isinstance(final_score, (int, float)) and not math.isnan(final_score):
+                st.success(f"🎯 Final Score: {round(final_score, 2)}%")
+            else:
+                st.success("🎯 Final Score: 0.00%")
+
+            # Breakdown
+            with st.expander("📊 Detailed Breakdown"):
+                st.write(f"📊 Text Similarity: {round(tfidf_percent, 2)}%")
+                st.write(f"🧠 Skill Match: {round(skill_match_percent, 2)}%")
+
+            # Matched Skills
+            st.markdown("### ✅ Matched Skills")
+            for skill in matched_skills:
+                st.write(f"✅ {skill.capitalize()}")
+
+            st.markdown("---")
+
+            # Missing Skills
+            missing_skills = [skill for skill in skills if skill not in resume_text]
+
+            st.markdown("### ❌ Missing Skills")
+            for skill in missing_skills:
+                st.write(f"❌ {skill.capitalize()}")
+
+            # Match Strength
+            if skill_match_percent > 70:
+                st.success("💪 Strong Match")
+            elif skill_match_percent > 40:
+                st.warning("⚠️ Moderate Match")
+            else:
+                st.error("❌ Weak Match")
+
+            st.info(f"Out of {len(skills)} required skills, {len(matched_skills)} matched")
+
+            # Download report
+            report = f"""
+Candidate: {name}
+Final Score: {final_score:.2f}%
+Text Similarity: {tfidf_percent:.2f}%
+Skill Match: {skill_match_percent:.2f}%
+
+Matched Skills: {", ".join(matched_skills)}
+Missing Skills: {", ".join(missing_skills)}
+"""
+            st.download_button("📥 Download Report", report, file_name="report.txt")
