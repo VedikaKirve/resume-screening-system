@@ -64,9 +64,11 @@ if st.button("Analyze"):
         for name, score, resume_text in ranked:
 
             # ✅ Safe TF-IDF %
-            if isinstance(score, (int, float)) and not math.isnan(score):
-                tfidf_percent = float(score) * 100
-            else:
+            # convert score safely
+            try:
+                score = float(score)
+                tfidf_percent = score * 100
+            except:
                 tfidf_percent = 0
 
             # ✅ Skill match
@@ -94,7 +96,7 @@ if st.button("Analyze"):
 
             # Breakdown
             with st.expander("📊 Detailed Breakdown"):
-                st.write(f"📊 Text Similarity: {round(tfidf_percent, 2)}%")
+                st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
                 st.write(f"🧠 Skill Match: {round(skill_match_percent, 2)}%")
 
             # Matched Skills
