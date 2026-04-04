@@ -53,14 +53,9 @@ Final Score = 0.5 × Text Similarity + 0.5 × Skill Match
 Deployed using Streamlit Cloud
 
 ## 🧩 Challenges Faced
-Handling PDF text extraction issues
-Debugging NumPy vs float conversion errors
-Ensuring smooth deployment on Streamlit
-
-## 🧩 Challenges Faced
-Handling PDF text extraction issues
-Debugging NumPy vs float conversion errors
-Ensuring smooth deployment on Streamlit
+- Handling PDF text extraction issues
+- Debugging NumPy vs float conversion errors
+- Ensuring smooth deployment on Streamlit
 
 ## 📦 Installation (Local Setup)
 - git clone https://github.com/VedikaKirve/resume-screening-system.git
