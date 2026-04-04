@@ -72,7 +72,10 @@ if st.button("Analyze"):
         st.progress(progress_value)
     else:
         st.progress(0)
-    st.success(f"🎯 Final Score: {final_score:.2f}%")
+    if isinstance(final_score, (int, float)) and not math.isnan(final_score):
+        st.success(f"🎯 Final Score: {final_score:.2f}%")
+    else:
+        st.success("🎯 Final Score: 0.00%")
 
     with st.expander("📊 Detailed Breakdown"):
         st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
