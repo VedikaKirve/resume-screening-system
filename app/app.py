@@ -64,7 +64,7 @@ if st.button("Analyze"):
     skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
 
     if isinstance(score, (int, float)) and not math.isnan(score):
-        tfidf_percent = score * 100
+        tfidf_percent = float(score) * 100
     else:
         tfidf_percent = 0
 
@@ -90,7 +90,10 @@ if st.button("Analyze"):
         st.success("🎯 Final Score: 0.00%")
 
     with st.expander("📊 Detailed Breakdown"):
-        st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
+        if isinstance(tfidf_percent, (int, float)) and not math.isnan(tfidf_percent):
+            st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
+        else:
+            st.write("📊 Text Similarity: 0.00%")
         st.write(f"🧠 Skill Match: {skill_percent:.2f}%")
 
     # Show matched skills
