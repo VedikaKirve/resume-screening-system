@@ -1,16 +1,18 @@
-from sentence_transformers import SentenceTransformer, util
+import streamlit as st
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Load model once
-model = SentenceTransformer('all-MiniLM-L6-v2')
+@st.cache_resource
+def load_model():
+    return SentenceTransformer('all-MiniLM-L6-v2')
+
+model = load_model()
 
 def get_bert_similarity(resumes, job_desc):
-    scores = []
+    job_embedding = model.encode([job_desc])
 
-    job_embedding = model.encode(job_desc)
+    resume_embeddings = model.encode(resumes)
 
-    for resume in resumes:
-        resume_embedding = model.encode(resume)
-        similarity = util.cos_sim(resume_embedding, job_embedding)
-        scores.append(similarity.item())
+    scores = cosine_similarity(job_embedding, resume_embeddings)
 
-    return scores
+    return scores[0]
