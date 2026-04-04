@@ -78,13 +78,10 @@ if st.button("Analyze"):
 
             # Display
             st.write(f"📄 {name}")
+            st.write("CHECK %:", percentage)
 
             # Progress bar (safe)
-            try:
-                progress_value = int(min(max(percentage, 0), 100))
-                st.progress(progress_value)
-            except:
-                st.progress(0)
+            st.progress(int(min(max(percentage, 0), 100)))
 
             # Final score (safe)
             try:
@@ -96,7 +93,7 @@ if st.button("Analyze"):
                 st.success("🎯 Final Score: 0.00%")
 
             # Breakdown
-            st.write("CHECK %:", percentage)
+            
             with st.expander("📊 Detailed Breakdown"):
                 st.write(f"📊 Text Similarity: {percentage:.2f}%")
                 st.write(f"🧠 Skill Match: {skill_match_percent:.2f}%")
