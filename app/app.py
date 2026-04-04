@@ -47,6 +47,9 @@ if st.button("Analyze"):
     # ✅ Step 4: ML processing
     vectors = get_vectors(resumes, job_clean)
     scores = calculate_similarity(vectors)
+    st.write("DEBUG SCORES:", scores)
+    st.write("JOB DESC:", job_clean[:200])
+    st.write("RESUME SAMPLE:", resumes[0][:200])
 
     ranked = sorted(zip(names, scores, resumes), key=lambda x: x[1], reverse=True)
 
