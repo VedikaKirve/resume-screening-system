@@ -65,7 +65,9 @@ if st.button("Analyze"):
     final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent) 
 
     st.write(f"📄 {name}")
-    st.progress(min(max(int(percentage), 0), 100))
+    if percentage is not None:
+        progress_value = min(max(int(percentage), 0), 100)
+        st.progress(progress_value)
     st.success(f"🎯 Final Score: {final_score:.2f}%")
 
     with st.expander("📊 Detailed Breakdown"):
