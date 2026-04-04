@@ -96,6 +96,7 @@ if st.button("Analyze"):
                 st.success("🎯 Final Score: 0.00%")
 
             # Breakdown
+            st.write("CHECK %:", percentage)
             with st.expander("📊 Detailed Breakdown"):
                 st.write(f"📊 Text Similarity: {percentage:.2f}%")
                 st.write(f"🧠 Skill Match: {skill_match_percent:.2f}%")
