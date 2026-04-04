@@ -59,17 +59,17 @@ if st.button("Analyze"):
     matched_skills = [skill for skill in skills if skill in resume_text]
     skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
 
-    bert_percent = score * 100
+    tfidf_percent = score * 100
     skill_percent = skill_match_percent
 
-    final_score = (0.6 * bert_percent) + (0.4 * skill_percent)
+    final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent) 
 
     st.write(f"📄 {name}")
     st.progress(int(percentage))
     st.success(f"🎯 Final Score: {final_score:.2f}%")
 
     with st.expander("📊 Detailed Breakdown"):
-        st.write(f"🤖 BERT Score: {bert_percent:.2f}%")
+        st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
         st.write(f"🧠 Skill Match: {skill_percent:.2f}%")
 
     # Show matched skills
