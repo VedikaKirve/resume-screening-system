@@ -51,7 +51,7 @@ if st.button("Analyze"):
         vectors = get_vectors(resumes, job_clean)
         scores = calculate_similarity(vectors)
 
-        # DEBUG (you can remove later)
+        # DEBUG (remove later if needed)
         st.write("DEBUG SCORES:", scores)
 
         # Ranking
@@ -63,57 +63,58 @@ if st.button("Analyze"):
         # Loop through candidates
         for name, score, resume_text in ranked:
 
-            # ✅ Safe TF-IDF %
-            # convert score safely
+            # ✅ SINGLE FIXED VARIABLE
             try:
-                score = float(score)
-                tfidf_percent = score * 100
+                percentage = float(score) * 100
             except:
-                tfidf_percent = 0
+                percentage = 0
 
-            # ✅ Skill match
+            # Skill match
             matched_skills = [skill for skill in skills if skill in resume_text]
             skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
 
-            # ✅ Final Score (balanced)
-            final_score = (0.5 * tfidf_percent) + (0.5 * skill_match_percent)
+            # Final score
+            final_score = (0.5 * percentage) + (0.5 * skill_match_percent)
 
-            # Display candidate
+            # Display
             st.write(f"📄 {name}")
 
-            # Progress bar
+            # Progress bar (safe)
             try:
-                progress_value = int(min(max(tfidf_percent, 0), 100))
+                progress_value = int(min(max(percentage, 0), 100))
                 st.progress(progress_value)
             except:
                 st.progress(0)
 
-            # Final Score
-            if isinstance(final_score, (int, float)) and not math.isnan(final_score):
-                st.success(f"🎯 Final Score: {round(final_score, 2)}%")
-            else:
+            # Final score (safe)
+            try:
+                if not math.isnan(final_score):
+                    st.success(f"🎯 Final Score: {final_score:.2f}%")
+                else:
+                    st.success("🎯 Final Score: 0.00%")
+            except:
                 st.success("🎯 Final Score: 0.00%")
 
             # Breakdown
             with st.expander("📊 Detailed Breakdown"):
-                st.write(f"📊 Text Similarity: {tfidf_percent:.2f}%")
-                st.write(f"🧠 Skill Match: {round(skill_match_percent, 2)}%")
+                st.write(f"📊 Text Similarity: {percentage:.2f}%")
+                st.write(f"🧠 Skill Match: {skill_match_percent:.2f}%")
 
-            # Matched Skills
+            # Matched skills
             st.markdown("### ✅ Matched Skills")
             for skill in matched_skills:
                 st.write(f"✅ {skill.capitalize()}")
 
             st.markdown("---")
 
-            # Missing Skills
+            # Missing skills
             missing_skills = [skill for skill in skills if skill not in resume_text]
 
             st.markdown("### ❌ Missing Skills")
             for skill in missing_skills:
                 st.write(f"❌ {skill.capitalize()}")
 
-            # Match Strength
+            # Match strength
             if skill_match_percent > 70:
                 st.success("💪 Strong Match")
             elif skill_match_percent > 40:
@@ -123,11 +124,11 @@ if st.button("Analyze"):
 
             st.info(f"Out of {len(skills)} required skills, {len(matched_skills)} matched")
 
-            # Download report
+            # Report
             report = f"""
 Candidate: {name}
 Final Score: {final_score:.2f}%
-Text Similarity: {tfidf_percent:.2f}%
+Text Similarity: {percentage:.2f}%
 Skill Match: {skill_match_percent:.2f}%
 
 Matched Skills: {", ".join(matched_skills)}
