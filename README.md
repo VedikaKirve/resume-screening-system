@@ -21,3 +21,6 @@ AI-based system that ranks resumes using NLP.
 
 ## ▶️ How to Run
 streamlit run app/app.py
+
+## 🌍 Live Demo
+https://resume-screening-system-app.streamlit.app/
