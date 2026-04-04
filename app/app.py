@@ -60,10 +60,19 @@ if st.button("Analyze"):
     matched_skills = [skill for skill in skills if skill in resume_text]
     skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
 
-    tfidf_percent = score * 100
+    if isinstance(score, (int, float)) and not math.isnan(score):
+        tfidf_percent = score * 100
+    else:
+        tfidf_percent = 0
+
     skill_percent = skill_match_percent
 
-    final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent) 
+    final_score = (0.5 * tfidf_percent) + (0.5 * skill_percent)
+
+    if isinstance(score, (int, float)) and not math.isnan(score):
+        percentage = score * 100
+    else:
+        percentage = 0
 
     st.write(f"📄 {name}")
 
