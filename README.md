@@ -63,10 +63,10 @@ Debugging NumPy vs float conversion errors
 Ensuring smooth deployment on Streamlit
 
 ## 📦 Installation (Local Setup)
-git clone https://github.com/VedikaKirve/resume-screening-system.git
-cd resume-screening-system
-pip install -r requirements.txt
-streamlit run app/app.py
+-git clone https://github.com/VedikaKirve/resume-screening-system.git
+-cd resume-screening-system
+-pip install -r requirements.txt
+-streamlit run app/app.py
 
 ## 🌍 Live Demo
 https://resume-screening-system-app.streamlit.app/
