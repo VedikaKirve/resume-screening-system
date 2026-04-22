@@ -135,4 +135,9 @@ Skill Match: {skill_match_percent:.2f}%
 Matched Skills: {", ".join(matched_skills)}
 Missing Skills: {", ".join(missing_skills)}
 """
-            st.download_button("📥 Download Report", report, file_name="report.txt")
+            st.download_button(
+    "📥 Download Report",
+    report,
+    file_name=f"{name}_report.txt",
+    key=f"download_{name}"
+)
