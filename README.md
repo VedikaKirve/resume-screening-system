@@ -1,61 +1,117 @@
 # 📄 Resume Screening System
-A Smart Resume Screening System that ranks candidates based on job description relevance using Natural Language Processing (NLP).
+An intelligent Resume Screening System that analyzes and ranks resumes based on a given job description using Natural Language Processing (NLP) and Machine Learning techniques.
+🚀 Live App: https://resume-screening-system-m6rbvdhdsndztgmlynppdn.streamlit.app/
 
-## 🔍 Problem
-Manual resume screening is time-consuming and inefficient when handling large volumes of applications.
-
-## 💡 Solution
-Developed an NLP-based Resume Screening System using TF-IDF and cosine similarity to automatically rank candidates based on job description relevance and skill matching.
 
 ## 📌 Project Overview
+This project simulates a real-world Applicant Tracking System (ATS) used by recruiters to filter and rank candidates.
+Unlike traditional ATS tools, this system not only ranks resumes but also provides:
 
-This project automates the process of screening resumes by comparing them with a job description and ranking candidates based on relevance.
+📊 Skill match insights
+❌ Missing skill detection
+💡 Resume improvement suggestions
+🧠 Explainable results (Why this candidate?)
 
-It uses **TF-IDF vectorization** and **cosine similarity** to measure how closely a resume matches the job requirements.
+
+## 🔍 Problem
+Manual resume screening is time-consuming, inconsistent, and often relies on basic keyword matching, leading to inefficient candidate selection.
+
+
+## 💡 Solution
+Developed an AI-based Resume Screening System using TF-IDF and cosine similarity to automatically rank candidates, provide skill gap analysis, and deliver explainable insights through an interactive dashboard.
+
 
 ## ✨ Features
 
-- 📄 Upload multiple resumes (PDF)
-- 🧠 Extract required skills from job description
-- 📊 Rank candidates based on similarity score
-- 🎯 Final score combining:
-- Text similarity
-- Skill match percentage
-- 📋 Detailed breakdown of results
-- 📥 Download candidate report
-- ⚡ Fast and lightweight (no heavy ML models)
+### 🔍 Resume Analysis
+Extracts text from uploaded PDF resumes
+Cleans and preprocesses textual data
+
+### 📊 Smart Ranking System
+Uses TF-IDF Vectorization
+Computes Cosine Similarity
+Ranks candidates based on relevance to job description
+
+### 🧠 Explainable AI (XAI)
+Shows why a candidate is selected
+Highlights matched and missing skills
+Provides actionable suggestions
+
+### 🎯 Role Prediction
+Predicts candidate role (Data Analyst, ML Engineer, etc.)
+Based on keyword logic
+
+### 📈 Interactive Dashboard
+Candidate comparison bar chart
+Progress bars and scoring system
+Detailed breakdown for each candidate
+
+### 📄 Report Generation
+Downloadable report for each candidate
+
+### 🌐 Live Deployment
+Fully deployed using Streamlit Cloud
+
 
 ## 🛠️ Tech Stack
 
-- **Python**
-- **Streamlit** (UI & deployment)
-- **NLP** (TF-IDF, cosine similarity)
-- **NLTK / Text preprocessing**
-- **Pandas**
+- Frontend/UI: Streamlit
+- Backend: Python
+- Libraries:
+-- pandas
+-- numpy
+-- scikit-learn
+-- PyMuPDF
+- ML Techniques:
+-- TF-IDF Vectorization
+-- Cosine Similarity
+
 
 ## ⚙️ How It Works
 
-1. User enters a job description
-2. Uploads multiple resumes (PDF)
-3. Text is extracted and cleaned
-4. TF-IDF vectors are created
-5. Cosine similarity is calculated
-6. Skills are matched
-7. Final score is computed and displayed
+1. Upload multiple resumes (PDF format)
+2. Enter a job description
+3. System processes and analyzes resumes
+4. Generates:
+- Ranking of candidates
+- Skill match percentage
+- Missing skills
+- Final score
+5. Displays results in an interactive dashboard
+
 
 ## 🧠 Scoring Logic
 Final Score = 0.5 × Text Similarity + 0.5 × Skill Match
 
+
 ## 📸 Screenshots
 (Add images)
 
+
 ## 🚀 Deployment
 Deployed using Streamlit Cloud
+
 
 ## 🧩 Challenges Faced
 - Handling PDF text extraction issues
 - Debugging NumPy vs float conversion errors
 - Ensuring smooth deployment on Streamlit
+
+
+## 🚀 Future Enhancements
+- 🤖 AI-based resume feedback (LLM integration)
+- 🧠 Semantic similarity using BERT
+- 🔐 User authentication system
+- 📊 Advanced analytics dashboard
+- 🌍 Multi-language resume support
+
+
+## 🎯 Learning Outcomes
+- Applied NLP techniques in a real-world problem
+- Built an end-to-end ML project
+- Designed an interactive dashboard
+- Deployed a production-ready web app
+
 
 ## 📦 Installation (Local Setup)
 - git clone https://github.com/VedikaKirve/resume-screening-system.git
@@ -63,8 +119,10 @@ Deployed using Streamlit Cloud
 - pip install -r requirements.txt
 - streamlit run app/app.py
 
+
 ## 🌍 Live Demo
-https://resume-screening-system-app.streamlit.app/
+https://resume-screening-system-m6rbvdhdsndztgmlynppdn.streamlit.app/
+
 
 ## Author
 **Vedika Kirve**
