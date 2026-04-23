@@ -1,7 +1,8 @@
 import sys
 import os
-import math
 import streamlit as st
+import pandas as pd
+import re
 
 # Fix import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -13,16 +14,20 @@ from src.vectorizer import get_vectors
 from src.similarity import calculate_similarity
 from src.skills_extractor import extract_skills
 
-# UI
+
+# ================= UI =================
 st.title("📄 Resume Screening System")
 
 job_desc = st.text_area("Enter Job Description")
 files = st.file_uploader("Upload Resumes", accept_multiple_files=True)
 
+
+# ================= MAIN =================
 if st.button("Analyze"):
 
     if not files or not job_desc:
         st.warning("Please upload resumes and enter job description")
+
     else:
         st.subheader("📊 Resume Ranking Results")
         st.progress(30)
@@ -30,103 +35,140 @@ if st.button("Analyze"):
         resumes = []
         names = []
 
-        # Step 1: Process resumes
+        # STEP 1: Process resumes
         for file in files:
             text = extract_text(file)
             clean = clean_text(text)
             resumes.append(clean)
             names.append(file.name)
 
-        # Step 2: Clean job description
+        # STEP 2: Clean JD
         job_clean = clean_text(job_desc)
 
-        # Step 3: Extract skills
+        # STEP 3: Extract skills
         skills = extract_skills(job_clean)
 
         st.markdown("### 🧠 Required Skills")
         for skill in skills:
             st.write(f"✅ {skill.capitalize()}")
 
-        # Step 4: TF-IDF + Similarity
+        # STEP 4: Similarity
         vectors = get_vectors(resumes, job_clean)
         scores = calculate_similarity(vectors)
-
-        # DEBUG (remove later if needed)
-        st.write("DEBUG SCORES:", scores)
 
         # Ranking
         ranked = sorted(zip(names, scores, resumes), key=lambda x: x[1], reverse=True)
 
-        # Top candidate
-        st.success(f"🏆 Top Candidate: {ranked[0][0]}")
+        # ================= CHART =================
+        df = pd.DataFrame({
+            "Candidate": names,
+            "Score": [float(s) * 100 for s in scores]
+        })
 
-        # Loop through candidates
+        st.markdown("## 📊 Candidate Comparison")
+        st.bar_chart(df.set_index("Candidate"))
+
+        # ================= TOP CANDIDATE =================
+        st.markdown("## 🏆 Top Candidate")
+        st.success(f"{ranked[0][0]} ({round(ranked[0][1]*100,2)}%)")
+
+        # ================= LOOP =================
         for name, score, resume_text in ranked:
 
+            # ---------- SCORE ----------
             try:
-                # handle numpy array properly
                 if hasattr(score, "__len__"):
                     score = score[0]
-
                 percentage = float(score) * 100
             except:
                 percentage = 0
 
-            # Skill match
-            matched_skills = [skill for skill in skills if skill in resume_text]
+            # ---------- SKILL MATCH ----------
+            matched_skills = [s for s in skills if s in resume_text]
+            missing_skills = [s for s in skills if s not in resume_text]
+
             skill_match_percent = (len(matched_skills) / len(skills)) * 100 if skills else 0
 
-            # Final score
             final_score = (0.5 * percentage) + (0.5 * skill_match_percent)
 
-            # Display
-            st.write(f"📄 {name}")
-            st.write("CHECK %:", percentage)
-
-            # Progress bar (safe)
-            st.progress(int(min(max(percentage, 0), 100)))
-
-            # Final score (safe)
-            try:
-                if not math.isnan(final_score):
-                    st.success(f"🎯 Final Score: {final_score:.2f}%")
-                else:
-                    st.success("🎯 Final Score: 0.00%")
-            except:
-                st.success("🎯 Final Score: 0.00%")
-
-            # Breakdown
-            
-            with st.expander("📊 Detailed Breakdown"):
-                st.write(f"📊 Text Similarity: {percentage:.2f}%")
-                st.write(f"🧠 Skill Match: {skill_match_percent:.2f}%")
-
-            # Matched skills
-            st.markdown("### ✅ Matched Skills")
-            for skill in matched_skills:
-                st.write(f"✅ {skill.capitalize()}")
-
-            st.markdown("---")
-
-            # Missing skills
-            missing_skills = [skill for skill in skills if skill not in resume_text]
-
-            st.markdown("### ❌ Missing Skills")
-            for skill in missing_skills:
-                st.write(f"❌ {skill.capitalize()}")
-
-            # Match strength
-            if skill_match_percent > 70:
-                st.success("💪 Strong Match")
-            elif skill_match_percent > 40:
-                st.warning("⚠️ Moderate Match")
+            # ---------- ROLE FIT ----------
+            if "machine learning" in resume_text:
+                role = "ML Engineer"
+            elif "sql" in resume_text:
+                role = "Data Analyst"
+            elif "excel" in resume_text:
+                role = "Business Analyst"
             else:
-                st.error("❌ Weak Match")
+                role = "General Role"
 
-            st.info(f"Out of {len(skills)} required skills, {len(matched_skills)} matched")
+            # ---------- EXPERIENCE ----------
+            exp_match = re.findall(r"(\d+\+?\s*(?:years|yrs))", resume_text.lower())
+            experience = exp_match[0] if exp_match else "Not Mentioned"
 
-            # Report
-            report = f"""
+            # ================= UI CARD =================
+            with st.container():
+                st.divider()
+
+                st.subheader(f"📄 {name}")
+                st.write(f"📅 Experience: {experience}")
+                st.write(f"🎯 Role Fit: {role}")
+
+                # SCORE UI
+                col1, col2 = st.columns([4, 1])
+
+                with col1:
+                    st.progress(int(min(max(percentage, 0), 100)))
+
+                with col2:
+                    st.metric("Score", f"{round(final_score, 2)}%")
+
+                # ---------- BREAKDOWN ----------
+                with st.expander("📊 Detailed Breakdown"):
+                    st.write(f"Text Similarity: {percentage:.2f}%")
+                    st.write(f"Skill Match: {skill_match_percent:.2f}%")
+
+                # ---------- SKILLS ----------
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.markdown("### ✅ Matched Skills")
+                    for s in matched_skills:
+                        st.write(f"✔ {s.upper()}")
+
+                with col2:
+                    if missing_skills:
+                        st.markdown("### ❌ Missing Skills")
+                        for s in missing_skills:
+                            st.write(f"✖ {s}")
+                    else:
+                        st.success("🎉 No missing skills!")
+
+                # ---------- MATCH STRENGTH ----------
+                if skill_match_percent > 70:
+                    st.success("💪 Strong Match")
+                elif skill_match_percent > 40:
+                    st.warning("⚠️ Moderate Match")
+                else:
+                    st.error("❌ Weak Match")
+
+                # ---------- WHY THIS CANDIDATE ----------
+                st.markdown("### 🧠 Why this candidate?")
+                reasons = []
+
+                for s in matched_skills:
+                    reasons.append(f"✔ Has {s}")
+
+                for s in missing_skills[:2]:
+                    reasons.append(f"❌ Missing {s}")
+
+                for r in reasons[:4]:
+                    st.write(r)
+
+                # ---------- INFO ----------
+                st.info(f"{len(matched_skills)}/{len(skills)} skills matched")
+
+                # ---------- REPORT ----------
+                report = f"""
 Candidate: {name}
 Final Score: {final_score:.2f}%
 Text Similarity: {percentage:.2f}%
@@ -135,9 +177,10 @@ Skill Match: {skill_match_percent:.2f}%
 Matched Skills: {", ".join(matched_skills)}
 Missing Skills: {", ".join(missing_skills)}
 """
-            st.download_button(
-    "📥 Download Report",
-    report,
-    file_name=f"{name}_report.txt",
-    key=f"download_{name}"
-)
+
+                st.download_button(
+                    "📥 Download Report",
+                    report,
+                    file_name=f"{name}_report.txt",
+                    key=f"download_{name}"
+                )
