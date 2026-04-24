@@ -84,10 +84,6 @@ Fully deployed using Streamlit Cloud
 Final Score = 0.5 × Text Similarity + 0.5 × Skill Match
 
 
-## 📸 Screenshots
-(Add images)
-
-
 ## 🚀 Deployment
 Deployed using Streamlit Cloud
 
